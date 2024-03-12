@@ -56,13 +56,13 @@ class PickCubeEnv(StationaryManipulationEnv):
             tcp_pose=vectorize_pose(self.tcp.pose),
             goal_pos=self.goal_pos,
         )
-        if self._obs_mode in ["state", "state_dict"]:
-            obs.update(
-                tcp_to_goal_pos=self.goal_pos - self.tcp.pose.p,
-                obj_pose=vectorize_pose(self.obj.pose),
-                tcp_to_obj_pos=self.obj.pose.p - self.tcp.pose.p,
-                obj_to_goal_pos=self.goal_pos - self.obj.pose.p,
-            )
+        obs.update(
+            tcp_to_goal_pos=self.goal_pos - self.tcp.pose.p,
+            obj_pose=vectorize_pose(self.obj.pose),
+            tcp_to_obj_pos=self.obj.pose.p - self.tcp.pose.p,
+            obj_to_goal_pos=self.goal_pos - self.obj.pose.p,
+            obj_grasped=not any(map(lambda c: c.actor0.name == "ground" or c.actor1.name == "ground", self.agent.scene.get_contacts()))
+        )
         return obs
 
     def check_obj_placed(self):

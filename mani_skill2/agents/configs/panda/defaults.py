@@ -2,6 +2,7 @@ from copy import deepcopy
 
 from mani_skill2.agents.controllers import *
 from mani_skill2.sensors.camera import CameraConfig
+import numpy as np
 
 
 class PandaDefaultConfig:
@@ -128,6 +129,20 @@ class PandaDefaultConfig:
             self.arm_force_limit,
             use_delta=True,
         )
+        arm_pd_ee_pose = PDEEPoseControllerConfig(
+            self.arm_joint_names,
+            -10.0,
+            10.0,
+            2*np.pi,
+            self.arm_stiffness,
+            self.arm_damping,
+            self.arm_force_limit,
+            ee_link=self.ee_link_name,
+            use_delta=False,
+            use_target=False,
+            normalize_action=False,
+            frame='base', # such that the position & rotation actions are always with respect to the base frame, since ee frame can change as control is being executed
+        )
 
         # -------------------------------------------------------------------------- #
         # Gripper
@@ -173,6 +188,9 @@ class PandaDefaultConfig:
             pd_joint_delta_pos_vel=dict(
                 arm=arm_pd_joint_delta_pos_vel, gripper=gripper_pd_joint_pos
             ),
+            pd_ee_pose=dict(
+                arm=arm_pd_ee_pose, gripper=gripper_pd_joint_pos
+            )
         )
 
         # Make a deepcopy in case users modify any config
